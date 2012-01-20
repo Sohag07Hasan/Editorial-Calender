@@ -1179,18 +1179,18 @@ var edcal = {
                  'id="post-' + post.id + '" class="post ' + post.status + ' ' + edcal.getPostEditableClass(post) + '"><div class="postlink ' + classString + '">' + posttitle + '</div>' +
                  '<div class="postactions">' +
                  '<a href="' + post.editlink + '">' + edcal.str_edit + '</a> | ' +
-            //     '<a href="#" onclick="edcal.editPost(' + post.id + '); return false;">' + edcal.str_quick_edit + '</a> | ' +
-                 '<a href="' + post.dellink + '" onclick="return edcal.confirmDelete(\'' + post.title + '\');">' + edcal.str_del + '</a> | ' +
-             //    '<a href="' + post.permalink + '">' + edcal.str_view + '</a>' +
+            //    '<a href="#" onclick="edcal.editPost(' + post.id + '); return false;">' + edcal.str_quick_edit + '</a> | ' +
+                 '<a href="' + post.dellink + '" onclick="return edcal.confirmDelete(\'' + post.title + '\');">' + edcal.str_del + '</a> ' +
+               //  '<a href="' + post.permalink + '">' + edcal.str_view + '</a>' +
                  '</div></li>';
          } else {
              return '<li onmouseover="edcal.showActionLinks(\'post-' + post.id + '\');" ' +
                  'onmouseout="edcal.hideActionLinks(\'post-' + post.id + '\');" ' +
                  'id="post-' + post.id + '" class="post ' + post.status + ' ' + edcal.getPostEditableClass(post) + '"><div class="postlink ' + classString + '">' + posttitle + '</div>' +
                  '<div class="postactions">' +
-                 '<a href="' + post.editlink + '">' + edcal.str_republish + '</a> | ' +
+                 '<a href="' + post.editlink + '">' + edcal.str_republish + '</a> ' +
                //  '<a href="' + post.permalink + '">' + edcal.str_view + '</a>' +
-                 '</div></li>';
+                 '</div></li>'; 
          }
     },
 
@@ -1779,7 +1779,7 @@ var edcal = {
 	var title = jQuery('#edcal-title-new-field').val();
 	var time = jQuery('#edcal-time').val();
 	var date = jQuery('#edcal-date').val();
-	var link = window.location.href + '&reminderset=yes&date=' + date + '&time=' + time + '&title=' + encodeURI(title);
+	var link = window.location.href + '&reminderset=yes&date=' + date + '&time=' + encodeURI(time) + '&title=' + encodeURI(title);
 	window.location.href = link;
 	return false;
            // return edcal.savePost(null, false, true);

@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 /*
-Plugin Name: WordPress Editorial Calendar
+Plugin Name: WordPress Editorial Calendar edited
 Description: The Editorial Calendar makes it possible to see all your posts and drag and drop them to manage your blog.
 Version: 1.8
 Author: Colin Vernon, Justin Evans, Joachim Kudish, Mary Vogt, and Zack Grossbart
@@ -62,16 +62,11 @@ class EdCal {
         add_action('wp_ajax_edcal_getpost', array(&$this, 'edcal_getpost'));
         add_action('wp_ajax_edcal_deletepost', array(&$this, 'edcal_deletepost'));
         add_action("init", array(&$this, 'edcal_load_language'));
+		
+	add_action('init',array($this,'create_reminder'));
+	add_action('admin_enqueue_scripts',array($this,'adding_css_js'),20);
 	
-	/*
-	if($_REQUEST['reminderset'] == 'yes' && isset($_REQUEST['date'])){
-			
-		$this->create_reminder($_REQUEST['date']);
-			
-	}
-	* */
-		add_action('init',array($this,'create_reminder'));
-	
+	add_action('wp_enqueue_scripts',array($this,'adding_css_js'),20);
         
         /*
          * This boolean variable will be used to check whether this 
@@ -87,11 +82,27 @@ class EdCal {
         //$edcal_endDate;
     }
     
+	function adding_css_js(){
+		if(current_user_can('manage_options')) return;
+		if(current_user_can('calendermenu')) :
+			wp_register_style('calender_to_admin_bar', plugins_url('',__FILE__).'/admin_bar.css' );
+			wp_enqueue_style('calender_to_admin_bar');
+			
+			if( isset($_REQUEST['post']) && isset($_REQUEST['action']) && isset($_REQUEST['message']) ) :
+				wp_register_style('calender_to_reminder_style', plugins_url('',__FILE__).'/reminder_view.css' );
+				wp_enqueue_style('calender_to_reminder_style');
+				wp_enqueue_script('jquery');
+				wp_enqueue_script('calender_to_reminder_js', plugins_url('',__FILE__).'/reminder_view.js',array('jquery'));
+				
+			endif;			
+			
+		endif;
+	}
+	
 	function create_reminder(){		
 		if($_REQUEST['reminderset'] == 'yes' && isset($_REQUEST['date'])) :
 			global $current_user;
-			get_currentuserinfo();
-			$message = 'This is just a friendly reminder from ' . $current_user->user_nicename . "'s office to remind you of an upcoming appointment at";
+			get_currentuserinfo();			
 			
 			if(!function_exists('wp_redirect')){
 				include ABSPATH . '/wp-includes/pluggable.php';
@@ -104,7 +115,7 @@ class EdCal {
 				$time = preg_replace('/PM/','',$time);
 				$times = explode(':',$time);
 				$time = (int) trim($time[0]) + 12;
-				$time = $time . ':' . $times[1] . ':00';
+				$time = $time . ':' . trim($times[1]) . ':00';
 			}
 
 			if($time == '12:00 AM'){
@@ -134,17 +145,18 @@ class EdCal {
 
 			$id = wp_insert_post($args);
 
-			if($id){
-				$url = get_option('siteurl') . "/wp-admin/post.php?post=$id&action=edit";
-				if(current_user_can('calendermenu')){
-					update_post_meta($id,'_reminderagent_sms_message',$message);
-				}
+			if($id){  
+				$url = get_option('siteurl') . "/wp-admin/post.php?post=$id&action=edit";				
+				update_post_meta($id, '_reminderagent_sms_message', get_user_meta($current_user->ID, 'reminderagent_sms', true));
+				update_post_meta($id, '_reminderagent_email_message', get_user_meta($current_user->ID, 'reminderagent_email', true));
+				update_post_meta($id, '_reminderagent_voice_message', get_user_meta($current_user->ID, 'reminderagent_tts', true));	
 			}
 			else{
 				$url = get_option('siteurl') . '/wp-admin/edit.php?post_type=reminderagent';			
 			}
 			
 			wp_redirect($url);
+			exit;
 		endif;
 	}
 	
@@ -159,11 +171,8 @@ class EdCal {
      */
 	function edcal_list_add_management_page() {
 	    if (function_exists('add_management_page') ) {
-			if(current_user_can('calendermenu')) :
-				$page = add_posts_page( __('Calendar', 'editorial-calendar'), __('Calendar', 'editorial-calendar'), 'calendermenu', 'cal', array(&$this, 'edcal_list_admin'));
-			 else:
 				$page = add_posts_page( __('Calendar', 'editorial-calendar'), __('Calendar', 'editorial-calendar'), 'edit_posts', 'cal', array(&$this, 'edcal_list_admin'));
-			 endif;
+			
 	        add_action( "admin_print_scripts-$page", array(&$this, 'edcal_scripts'));
 
 	        if( $this->supports_custom_types ) {

@@ -1,0 +1,15 @@
+/* 
+    Document   : admin_bar
+    Created on : Jan 14, 2012, 2:47:16 AM
+    Author     : s
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+#wp-admin-bar-new-media{
+	display: none;
+}
+#wpadminbar{
+	display: none;
+}
+
