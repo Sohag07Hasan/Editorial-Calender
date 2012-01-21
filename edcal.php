@@ -715,6 +715,7 @@ class EdCal {
      * value part. If $fullPost is set to true, post_content is also returned.
      */
     function edcal_postJSON($post, $addComma = true, $fullPost = false) {
+		/*
         $timeFormat = get_option("time_format");
         if ($timeFormat == "g:i a") {
             $timeFormat = "ga";
@@ -723,6 +724,7 @@ class EdCal {
         } else if ($timeFormat == "H:i") {
             $timeFormat = "H";
         }
+        */ 
         
         setup_postdata($post);
         
